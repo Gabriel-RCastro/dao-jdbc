@@ -66,8 +66,7 @@ public class SellerDaoImplJBDC implements SellerDao {
             preparedStatement = connection.prepareStatement(
                     "UPDATE seller " +
                             "SET Name = ?, Email = ?, BirthDate = ?, BaseSalary = ?, DepartmentId = ? " +
-                            "WHERE Id = ? ",
-                    Statement.RETURN_GENERATED_KEYS
+                            "WHERE Id = ? "
             );
 
             preparedStatement.setString(1, obj.getName());
@@ -87,7 +86,26 @@ public class SellerDaoImplJBDC implements SellerDao {
 
     @Override
     public void deleteById(Integer id) {
+        PreparedStatement preparedStatement = null;
 
+        try {
+            preparedStatement = connection.prepareStatement(
+                    "DELETE FROM seller " +
+                            "WHERE Id = ? "
+            );
+
+            preparedStatement.setInt(1, id);
+
+            int rowsAffected = preparedStatement.executeUpdate();
+
+            if (rowsAffected == 0) {
+                throw new DbException("Delete uncompleted! Id not exists");
+            }
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        } finally {
+            DB.closeStatement(preparedStatement);
+        }
     }
 
     @Override
